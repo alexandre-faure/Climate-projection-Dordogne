@@ -7,10 +7,9 @@
 This project aims to analyse future evolutions of the climate of the Dordogne region in France. It relies on IPCC models from CMIP6 for ssp245 and ssp585. This work was executed for the NGO [0.6 Planète](https://www.06planet.org/fr/), which is planning to build a resilient eco-village with a sustainable ecological footprint in collaboration with the [Université Paris Saclay](http://www.universite-paris-saclay.fr/objets-interdisciplinaires/alliance-climate-action-now). This work is one of the deliverables that support our recommandations in terms of urbanism and technical solutions.
 
 <div align="center">
-<img src="https://www.universite-paris-saclay.fr/sites/default/files/styles/max_325x325/public/2022-02/logo-allcan.png?itok=BPJUh5dQ" alt="Logo of AllACN, University of Paris Saclay" width=100>
-</div>
-<div align="center">
-<img src="https://www.06planet.org/wp-content/uploads/2021/06/cropped-logo-0.6planet-1.png" alt="Logo of 0.6 Planète" width=200 style="background-color:white;">
+<img src="https://www.universite-paris-saclay.fr/sites/default/files/styles/max_325x325/public/2022-02/logo-allcan.png?itok=BPJUh5dQ" alt="Logo of AllACN, University of Paris Saclay" width=120px>
+    &nbsp; & &nbsp;
+<img src="https://www.06planet.org/wp-content/uploads/2021/06/cropped-logo-0.6planet-1.png" alt="Logo of 0.6 Planète" width=200 style="background-color:white; margin-right:50px;">
 </div>
 
 ## Features

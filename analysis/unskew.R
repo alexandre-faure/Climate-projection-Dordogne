@@ -19,13 +19,7 @@ get_model_names <- function(folder, extension) {
     return(filenames)
 }
 
-model_names <- get_filenames_from_folder(path_to_predictions, ".csv")
-
-### Fonction pour récupérer le fichier correspondant au nom du modèle dans le dossier demandé
-get_data_filename <- function(folder, model_name, with_fullname = TRUE){
-    filename <- list.files(path = folder, pattern = paste(time_freq,"_",model_name,"_ssp", sep=""), full.names = with_fullname)
-    return(filename)
-}
+model_names <- get_model_names(path_to_predictions, ".csv")
 
 ### Récupération des données historiques réelles
 real_historical_filename <- list.files(path = "data/csv/observations", pattern = variable, full.names = TRUE)

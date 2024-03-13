@@ -5,3 +5,6 @@ data/temp/**
 !**.sh
 
 .vscode
+env
+
+**sandbox**

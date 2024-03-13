@@ -1,0 +1,7 @@
+data/raw/global/*
+data/raw/local/*
+
+data/temp/**
+!**.sh
+
+.vscode

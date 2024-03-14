@@ -50,14 +50,14 @@ def operation_on_data(data, variable_name):
         return data
 
 
-def extract_nc_files_to_csv(source_folder, destination_folder, year_start_model):
+def extract_nc_files_to_csv(source_folder, destination_folder):
     """
     This function extracts the data from .nc files and save them in .csv files.
 
     Args:
     source_folder (str): the folder containing the .nc files
     destination_folder (str): the folder to save the .csv files
-    date_start_model (int): the year to consider as the start of the model period
+    historical (bool): a boolean to tell wether data are historical or not
 
     Returns:
     None
@@ -79,11 +79,14 @@ def extract_nc_files_to_csv(source_folder, destination_folder, year_start_model)
         # Get the variable name
         variable_name = re.search(r'(.*?)_', filename).group(1)
 
-        # Get the ssp
-        ssp = re.search(r'ssp(.+?)_', filename).group(1)
+        # Get the ssp or historical
+        if "historical" in filename:
+            ssp = "historical"
+        else:
+            ssp = "ssp" + re.search(r'ssp(.+?)_', filename).group(1)
 
         # Get the destination folder
-        relative_destination_path = destination_folder + relative_path + "ssp" + ssp + "/"
+        relative_destination_path = destination_folder + relative_path + ssp + "/"
 
         # Create the destination folder if it does not exist
         if not os.path.exists(destination_folder + relative_path.split("/")[0]):
@@ -92,10 +95,6 @@ def extract_nc_files_to_csv(source_folder, destination_folder, year_start_model)
             os.makedirs(destination_folder + relative_path)
         if not os.path.exists(relative_destination_path):
             os.makedirs(relative_destination_path)
-        if not os.path.exists(relative_destination_path + "predictions/"):
-            os.makedirs(relative_destination_path + "predictions/")
-        if not os.path.exists(relative_destination_path + "historical/"):
-            os.makedirs(relative_destination_path + "historical/")
         
         ### Process dataframe
         df = data.to_dataframe()
@@ -117,11 +116,7 @@ def extract_nc_files_to_csv(source_folder, destination_folder, year_start_model)
         df = df[~df.index.duplicated(keep='first')]
 
         # Save the .csv file
-        df.to_csv(f"{relative_destination_path}predictions/{filename}.csv")
-
-        # Handle historical data
-        df = df[df.index.map(lambda x: int(x.split("-")[0]) < year_start_model)]
-        df.to_csv(f"{relative_destination_path}historical/{filename}.csv")
+        df.to_csv(f"{relative_destination_path}{filename}.csv")
 
         # Close the .nc file
         data.close()
@@ -129,4 +124,9 @@ def extract_nc_files_to_csv(source_folder, destination_folder, year_start_model)
 
 ### Main
 if __name__ == '__main__':
-    extract_nc_files_to_csv(DATA_FOLDER_PREFIX, RESULTS_FOLDER_PREFIX, 2023)
+    # Parse the arguments
+    parser = argparse.ArgumentParser(prefix="-", description="Extract data from .nc files and save them in .csv files.")
+    parser.add_argument("--source_folder", type=str,default=DATA_FOLDER_PREFIX, help="The folder containing the .nc files")
+    parser.add_argument("--destination_folder", type=str,default=RESULTS_FOLDER_PREFIX, help="The folder to save the .csv files")
+    args = parser.parse_args().__dict__
+    extract_nc_files_to_csv(**args)

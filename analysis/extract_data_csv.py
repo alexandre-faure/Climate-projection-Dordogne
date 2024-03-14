@@ -44,7 +44,7 @@ def operation_on_data(data, variable_name):
         return round(data - 273.15, 3)
     if variable_name == "pr":
         # Conversion des kg.m-2.s-1 en mm/m-2/j
-        return round(data * 3600 * 24 / 100, 3)
+        return round(data * 3600 * 24, 3)
     return data
 
 

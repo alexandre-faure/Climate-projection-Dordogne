@@ -1,4 +1,4 @@
-time,tasmax_day,tasmin_day,tas_day,pr_day
+time,tasmax,tasmin,tas,pr
 1950-01-01,4.9,-0.1,2.2,0.00
 1950-01-02,4.6,-3.1,-0.1,0.00
 1950-01-03,7.4,-0.4,4.5,0.70

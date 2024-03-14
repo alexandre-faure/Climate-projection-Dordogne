@@ -2,10 +2,10 @@ library(CDFt)
 library(stringr)
 
 ### Définition des variables
-variable <- "pr"
+variable <- "tasmax"
 time_freq <- "day"
-ssp <- "ssp245" # parmi ssp245 et ssp585
-path_to_data <- paste("data/csv/models/",variable, "_",time_freq, "/CMIP6/",sep="")
+ssp <- "historical" # parmi ssp245, ssp585 et historical
+path_to_data <- paste("data/csv/models/", variable, "_",time_freq, "/CMIP6/",sep="")
 path_to_predictions <- paste(path_to_data, ssp, "/", sep="")
 path_to_historical <- paste(path_to_data, "historical/", sep="")
 path_to_bias_adjusted <- paste(path_to_data, ssp, "_ba/", sep="")
@@ -27,12 +27,12 @@ model_names <- get_model_names(path_to_historical, ".csv")
 
 ### Récupération des données historiques réelles
 real_historical_data <- read.csv(real_historical_data_path, header = TRUE)
-real_historical_data <- real_historical_data[[paste(variable, "_day", sep="")]]
+real_historical_data <- real_historical_data[[variable]]
 real_historical_data <- as.numeric(unlist(real_historical_data))
 
 # Fonction pour récupérer le nom du fichier de données
 get_data_filename <- function(path, model_name, with_extension = TRUE){
-    filenames <- list.files(path = path, pattern = paste(model_name, ".*.csv", sep=""), full.names = with_extension)
+    filenames <- list.files(path = path, pattern = paste("_", model_name, "_.*.csv", sep=""), full.names = with_extension)
     # Si on trouve plus d'un fichier, on envoie un message d'avertissement
     if(length(filenames) > 1){
         warning(paste("Plus d'un fichier correspondant au modèle", model_name, "a été trouvé pour le dossier", path, ". Le premier fichier trouvé sera utilisé."))
@@ -77,6 +77,7 @@ for (model_name in model_names){
     ds <- CT$DS
     ds <- round(ds, 2)
     df <- data.frame(time, ds)
+    colnames(df) <- c("time", variable)
 
     # On écrit le dataframe dans un fichier csv
     write.csv(df,

@@ -16,10 +16,6 @@ from tqdm import tqdm
 DATA_FOLDER_PREFIX = "./data/raw/local/"
 RESULTS_FOLDER_PREFIX = "./data/csv/models/"
 
-# Data
-LATITUDE = 45.569816
-LONGITUDE = 0.79367470
-
 
 ### Definition of functions
 def find_recursievely_nc_files(folder):
@@ -44,13 +40,15 @@ def operation_on_data(data, variable_name):
     This function returns the operation to apply on data according to
     their name
     """
-    if variable_name == "tasmax":
-        return round(data - 273.15, 2)
-    else:
-        return data
+    if "tas" in variable_name:
+        return round(data - 273.15, 3)
+    if variable_name == "pr":
+        # Conversion des kg.m-2.s-1 en mm/m-2/j
+        return round(data * 3600 * 24 / 100, 3)
+    return data
 
 
-def extract_nc_files_to_csv(source_folder, destination_folder):
+def extract_nc_files_to_csv(source_folder):
     """
     This function extracts the data from .nc files and save them in .csv files.
 
@@ -65,15 +63,16 @@ def extract_nc_files_to_csv(source_folder, destination_folder):
     # List the .nc files
     nc_files = find_recursievely_nc_files(source_folder)
 
+    print(f"Extracting data from {source_folder}...")
+    print(f"Found {len(nc_files)} .nc files.")
+
     # Extract the data from the .nc files
     for i in tqdm(range(len(nc_files))):
         # Open the .nc file
         nc_file = nc_files[i]
         data = xr.open_dataset(nc_file)
 
-        # Miscellaneous information
-        relative_path = nc_file.split(source_folder)[-1]
-        relative_path = "/".join(relative_path.split("/")[0:-1]) + "/"
+        # Name of the file
         filename = nc_file.split("/")[-1].split(".nc")[0]
 
         # Get the variable name
@@ -84,15 +83,15 @@ def extract_nc_files_to_csv(source_folder, destination_folder):
             ssp = "historical"
         else:
             ssp = "ssp" + re.search(r'ssp(.+?)_', filename).group(1)
+        
+        # Get the period of the data
+        period = re.search(f'{variable_name}_(.+?)_', filename).group(1)
 
         # Get the destination folder
-        relative_destination_path = destination_folder + relative_path + ssp + "/"
+        relative_path = f"{variable_name}_{period}/CMIP6/{ssp}/"
+        relative_destination_path = RESULTS_FOLDER_PREFIX + relative_path
 
         # Create the destination folder if it does not exist
-        if not os.path.exists(destination_folder + relative_path.split("/")[0]):
-            os.makedirs(destination_folder + relative_path.split("/")[0])
-        if not os.path.exists(destination_folder + relative_path):
-            os.makedirs(destination_folder + relative_path)
         if not os.path.exists(relative_destination_path):
             os.makedirs(relative_destination_path)
         
@@ -107,7 +106,7 @@ def extract_nc_files_to_csv(source_folder, destination_folder):
 
         # Remove irrelevant columns
         df.drop(columns=[col for col in df.columns if col not in ["time", variable_name]], inplace=True)
-        df[variable_name] = df[variable_name].round(2)
+        df[variable_name] = df[variable_name]
 
         # Apply the operation on the data
         df[variable_name] = operation_on_data(df[variable_name], variable_name)
@@ -125,8 +124,7 @@ def extract_nc_files_to_csv(source_folder, destination_folder):
 ### Main
 if __name__ == '__main__':
     # Parse the arguments
-    parser = argparse.ArgumentParser(prefix="-", description="Extract data from .nc files and save them in .csv files.")
+    parser = argparse.ArgumentParser(prefix_chars="-", description="Extract data from .nc files and save them in .csv files.")
     parser.add_argument("--source_folder", type=str,default=DATA_FOLDER_PREFIX, help="The folder containing the .nc files")
-    parser.add_argument("--destination_folder", type=str,default=RESULTS_FOLDER_PREFIX, help="The folder to save the .csv files")
     args = parser.parse_args().__dict__
     extract_nc_files_to_csv(**args)

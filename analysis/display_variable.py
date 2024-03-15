@@ -82,7 +82,7 @@ def plot_graphics(result, variable, ssp, season):
 
     # Ligne de référence
     if "drawRefLine" in result["misc"]:
-        plt.axhline(y=result["misc"]["drawRefLine"], color="black", lw=1, linestyle="--", alpha=0.7)
+        plt.axhline(y=result["misc"]["drawRefLine"], color="black", lw=1, linestyle="--", alpha=0.7, label="Moyenne de la période de référence")
     
     # Médiane entre les modèles
     median = np.median(list(result["data"].values()), axis=0)
@@ -90,8 +90,16 @@ def plot_graphics(result, variable, ssp, season):
     
     # Limites du graphique
     plt.xlim(REF_YEARS[0], PROJECTION_YEARS[1]+1)
-    if "yMin" in result["misc"]:
-        plt.ylim(result["misc"]["yMin"], plt.gca().get_ylim()[1])
+    if "yLim" in result["misc"]:
+        if result["misc"]["yLim"][0] == "auto":
+            ylim1 = plt.gca().get_ylim()[0]
+        else:
+            ylim1 = result["misc"]["yLim"][0]
+        if result["misc"]["yLim"][1] == "auto":
+            ylim2 = plt.gca().get_ylim()[1]
+        else:
+            ylim2 = result["misc"]["yLim"][1]
+        plt.ylim(ylim1, ylim2)
 
     
     # On affiche un trait vertical vert pour signifier l'année 2024 (actuelle)
@@ -104,7 +112,7 @@ def plot_graphics(result, variable, ssp, season):
         plt.text(2024, plt.gca().get_ylim()[0] + 0.05 * (plt.gca().get_ylim()[1] - plt.gca().get_ylim()[0]),
                  "Année 2024", ha="center", va="center", color="black", bbox=dict(facecolor='white', alpha=0.9))
     
-    plt.legend()
+    plt.legend(loc="upper right")
     plt.grid(True, linestyle='--', alpha=0.6)
 
     # On créé le dossier de sauvegarde si il n'existe pas

@@ -147,6 +147,11 @@ def process_pr(models_data, variable_name, season, season_name, threshold, ssp, 
         np.median([total_precipitation[model][ref_years[0] - years[0]:ref_years[1] - years[0] + 1]
                    for model in total_precipitation], axis=1))
     
+    # Calcul du 90e percentile
+    # On calcule les déciles pour chaque année
+    deciles = np.max(np.percentile([total_precipitation[model] for model in total_precipitation], [90], axis=0))
+
+    
     result.append({
         "short_title": f"evolution-absolue",
         "title": f"Précipitations totales pour la saison {season_name} selon le SSP{re.sub('ssp', '', ssp)}\n"+
@@ -157,7 +162,7 @@ def process_pr(models_data, variable_name, season, season_name, threshold, ssp, 
         "x_values": years,
         "misc":{
             "drawRefLine":mean_ref,
-            "yMin": 0,
+            "yLim": [0, deciles * 1.25],
         }
     })
     
@@ -165,6 +170,7 @@ def process_pr(models_data, variable_name, season, season_name, threshold, ssp, 
     for model in total_precipitation:
         total_precipitation[model] = 100 * np.array(total_precipitation[model]) / mean_ref
 
+    deciles *= 100 / mean_ref
 
     result.append({
         "short_title": f"evolution-relative",
@@ -176,7 +182,7 @@ def process_pr(models_data, variable_name, season, season_name, threshold, ssp, 
         "x_values": years,
         "misc":{
             "drawRefLine":100,
-            "yMin": 0,
+            "yLim": [0, deciles * 1.25],
         }
     })
 
